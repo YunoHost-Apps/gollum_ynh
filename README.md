@@ -1,11 +1,12 @@
-# Gollum for Yunohost
+# (Dockerized) Gollum for Yunohost
 
 [![Install gollum with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=gollum)
 
 A simple, Git-powered wiki with a sweet API and local frontend.
 
-**[Checkout the official Gollum repository](https://github.com/gollum/gollum/)**
+*[Checkout the official Gollum repository](https://github.com/gollum/gollum/)*
 
+**Careful! This will install Docker on your instance!**
 This app is inside a [Docker image](https://hub.docker.com/r/gollumorg/gollum).
 
 ## Forking an external git repo
