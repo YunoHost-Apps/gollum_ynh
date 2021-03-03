@@ -76,7 +76,7 @@ dockerapp_ynh_loadvariables () {
 	export data_path=/home/yunohost.docker/$app
 	export port=$(ynh_app_setting_get $app port)
 	[ "$port" == "" ] && port=$(ynh_find_port 31000) && ynh_app_setting_set $app port $port
-	path_url=$(ynh_normalize_url_path $path)
+	path_url=$(ynh_normalize_url_path $path_url)
 	export architecture=$(dpkg --print-architecture)
 	export incontainer=$(dockerapp_ynh_incontainer)
 }
