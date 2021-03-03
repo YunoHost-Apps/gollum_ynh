@@ -7,7 +7,7 @@
         "en": "A simple, Git-powered wiki with a sweet API and local frontend.",
         "fr": "Un wiki simple basé sur Git avec API et front-end."
     },
-    "version": "1.0",
+    "version": "1.0~ynh1",
     "license": "AGPL-3.0",
     "maintainer": {
         "name": "Hadrien",

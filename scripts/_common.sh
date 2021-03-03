@@ -4,7 +4,7 @@
 # COMMON VARIABLES
 #=================================================
 
-nodejs_version="ruby-gollum-lib"
+pkg_dependencies="ruby-gollum-lib"
 
 #=================================================
 # PERSONAL HELPERS
