@@ -17,6 +17,7 @@ is_public=$YNH_APP_ARG_IS_PUBLIC
 
 # Source YunoHost helpers
 source _common.sh
+source docker/_gollum.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -57,6 +58,13 @@ dockerapp_ynh_findreplaceallvaribles
 
 # Copy files to the right place
 dockerapp_ynh_copyconf
+
+#=================================================
+# INIT GIT REPO
+#=================================================
+
+# Init git repo for the wiki to work
+gollum_ynh_gitinit
 
 #=================================================
 # START AND CREATE SERVICE

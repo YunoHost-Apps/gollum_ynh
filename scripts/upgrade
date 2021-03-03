@@ -41,6 +41,13 @@ dockerapp_ynh_findreplaceallvaribles
 dockerapp_ynh_copyconf
 
 #=================================================
+# INIT GIT REPO
+#=================================================
+
+# Init git repo for the wiki to work
+gollum_ynh_gitinit
+
+#=================================================
 # STOP AND REMOVE SERVICE
 #=================================================
 

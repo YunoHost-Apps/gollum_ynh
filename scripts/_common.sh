@@ -66,7 +66,7 @@ dockerapp_ynh_findreplaceallvaribles () {
         dockerapp_ynh_findreplacepath "YNH_DATA" "$data_path"
         dockerapp_ynh_findreplacepath "YNH_PORT" "$port"
         dockerapp_ynh_findreplacepath "YNH_PATH" "$path_url"
-	bash docker/_specificvariablesapp.sh
+	bash docker/_gollum.sh
 }
 
 # load variables
