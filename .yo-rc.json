@@ -1,0 +1,18 @@
+{
+  "generator-dockerapp-yunohost": {
+    "beautifulName": "gollum",
+    "defaultPathOption": "/gollum",
+    "forceSecureAccess": false,
+    "secureAccessOption": true,
+    "adminUserOption": false,
+    "enDescription": "A simple, Git-powered wiki with a sweet API and local frontend.",
+    "frDescription": "Un wiki simple basé sur Git avec API et front-end.",
+    "urlApp": "https://github.com/gollum/gollum/",
+    "urlDockerHub": "https://hub.docker.com/r/gollumorg/gollum",
+    "authorName": "Hadrien",
+    "authorEmail": "ketsapiwiq@protonmail.com",
+    "idName": "gollum",
+    "reverseProxyProtocol": "http",
+    "scriptsLoadSave": false
+  }
+}
