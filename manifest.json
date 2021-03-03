@@ -14,7 +14,7 @@
         "email": "ketsapiwiq@protonmail.com"
     },
     "requirements": {
-        "yunohost": ">= 2.7.2"
+        "yunohost": ">= 4.0.0"
     },
     "services": [
         "nginx"
@@ -26,8 +26,8 @@
                 "name": "domain",
                 "type": "domain",
                 "ask": {
-                    "en": "Choose a domain for gollum",
-                    "fr": "Choisissez un domaine pour gollum"
+                    "en": "Choose a domain for Gollum",
+                    "fr": "Choisissez un domaine pour Gollum"
                 },
                 "example": "app.domain.org"
             },
@@ -35,8 +35,8 @@
                 "name": "path",
                 "type": "path",
                 "ask": {
-                    "en": "Choose a path for gollum",
-                    "fr": "Choisissez un chemin pour gollum"
+                    "en": "Choose a path for Gollum",
+                    "fr": "Choisissez un chemin pour Gollum"
                 },
                 "example": "/mypath",
                 "default": "/"
@@ -44,7 +44,7 @@
                 "name": "is_public",
                 "type": "boolean",
                 "ask": {
-                    "en": "Can a non-member access the app ?",
+                    "en": "Can a non-member access the app?",
                     "fr": "Un non-membre peut-il accéder à l'application ?"
                 },
                 "default": true

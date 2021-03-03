@@ -1,100 +1,195 @@
 #!/bin/bash
 
 #=================================================
-# RETRIEVE ARGUMENTS FROM THE MANIFEST
-#=================================================
-
-# Retrieve arguments
-app=$YNH_APP_INSTANCE_NAME
-domain=$YNH_APP_ARG_DOMAIN
-path_url=$YNH_APP_ARG_PATH
-is_public=$YNH_APP_ARG_IS_PUBLIC
-
-
+# GENERIC START
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
-# Source YunoHost helpers
 source _common.sh
-source docker/_gollum.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
 # MANAGE SCRIPT FAILURE
 #=================================================
 
+ynh_clean_setup () {
+	### Remove this function if there's nothing to clean before calling the remove script.
+	true
+}
+# Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
 #=================================================
-# STORE SETTINGS FROM MANIFEST
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
 
-# store settings
-ynh_app_setting_set $app is_public $is_public
+domain=$YNH_APP_ARG_DOMAIN
+path_url=$YNH_APP_ARG_PATH
+admin=$YNH_APP_ARG_ADMIN
+is_public=$YNH_APP_ARG_IS_PUBLIC
+language=$YNH_APP_ARG_LANGUAGE
+password=$YNH_APP_ARG_PASSWORD
 
+app=$YNH_APP_INSTANCE_NAME
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
+ynh_script_progression --message="Validating installation parameters..." --time --weight=1
 
-# Check or install docker
-dockerapp_ynh_checkinstalldocker
+### If the app uses NGINX as web server (written in HTML/PHP in most cases), the final path should be "/var/www/$app".
+### If the app provides an internal web server (or uses another application server such as uWSGI), the final path should be "/opt/yunohost/$app"
+final_path=/var/www/$app
+test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
 
-# Check domain/path availability
-dockerapp_ynh_loadvariables
-ynh_webpath_available $domain $path_url
-ynh_webpath_register $app $domain $path_url
+# Register (book) web path
+ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
+
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+ynh_script_progression --message="Storing installation settings..." --time --weight=1
+
+ynh_app_setting_set --app=$app --key=domain --value=$domain
+ynh_app_setting_set --app=$app --key=path --value=$path_url
+ynh_app_setting_set --app=$app --key=admin --value=$admin
+ynh_app_setting_set --app=$app --key=language --value=$language
+
+#=================================================
+# STANDARD MODIFICATIONS
+#=================================================
+# FIND AND OPEN A PORT
+#=================================================
+ynh_script_progression --message="Finding an available port..." --time --weight=1
+
+# Find an available port
+port=$(ynh_find_port --port=4567)
+ynh_app_setting_set --app=$app --key=port --value=$port
+
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Installing dependencies..." --time --weight=1
+
+ynh_install_app_dependencies $pkg_dependencies
+
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+ynh_script_progression --message="Setting up source files..." --time --weight=1
+
+ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+# Download, check integrity, uncompress and patch the source from app.src
+#ynh_setup_source --dest_dir="$final_path"
+
+git clone https://github.com/gollum/gollum "$final_path" --quiet
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Configuring NGINX web server..." --time --weight=1
+
+# Create a dedicated NGINX config
+ynh_add_nginx_config
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..." --time --weight=1
+
+# Create a system user
+ynh_system_user_create --username=$app
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# ...
+#=================================================
+
+pushd "$final_path" || ynh_die
+    bundle install
+    bundle exec bin/gollum
+popd || ynh_die
+
+#=================================================
+# SETUP SYSTEMD
+#=================================================
+ynh_script_progression --message="Configuring a systemd service..." --time --weight=1
+
+# Create a dedicated systemd config
+ynh_add_systemd_config
 
 #=================================================
 # MODIFY A CONFIG FILE
 #=================================================
 
-dockerapp_ynh_findreplaceallvaribles
+### `ynh_replace_string` is used to replace a string in a file.
+### (It's compatible with sed regular expressions syntax)
+
+ynh_replace_string --match_string="match_string" --replace_string="replace_string" --target_file="$final_path/CONFIG_FILE"
 
 #=================================================
-# COPY CONF
+# STORE THE CONFIG FILE CHECKSUM
 #=================================================
 
-# Copy files to the right place
-dockerapp_ynh_copyconf
+# Calculate and store the config file checksum into the app settings
+ynh_store_file_checksum --file="$final_path/CONFIG_FILE"
 
 #=================================================
-# INIT GIT REPO
+# GENERIC FINALIZATION
+#=================================================
+# SECURE FILES AND DIRECTORIES
 #=================================================
 
-# Init git repo for the wiki to work
-gollum_ynh_gitinit
+# Set permissions to app files
+chown -R root: $final_path
 
 #=================================================
-# START AND CREATE SERVICE
+# INTEGRATE SERVICE IN YUNOHOST
 #=================================================
+ynh_script_progression --message="Integrating service in YunoHost..." --time --weight=1
 
-# docker run
-dockerapp_ynh_run
+yunohost service add $app --description="A short description of the app" --log="/var/log/$app/$app.log"
 
 #=================================================
-# NGINX CONFIGURATION
+# START SYSTEMD SERVICE
 #=================================================
+ynh_script_progression --message="Starting a systemd service..." --time --weight=1
 
-# Modify Nginx configuration file and copy it to Nginx conf directory
-dockerapp_ynh_preparenginx
+# Start a systemd service
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+
+#=================================================
+# SETUP FAIL2BAN
+#=================================================
+ynh_script_progression --message="Configuring Fail2Ban..." --time --weight=1
+
+# Create a dedicated Fail2Ban config
+ynh_add_fail2ban_config --logpath="/var/log/nginx/${domain}-error.log" --failregex="Regex to match into the log for a failed login"
 
 #=================================================
 # SETUP SSOWAT
 #=================================================
+ynh_script_progression --message="Configuring permissions..." --time --weight=1
 
-
-# Make app public if necessary or protect it
+# Make app public if necessary
 if [ $is_public -eq 1 ]
 then
-    ynh_app_setting_set $app skipped_uris "/"
+	# Everyone can access the app.
+	# The "main" permission is automatically created before the install script.
+	ynh_permission_update --permission="main" --add="visitors"
 fi
 
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..." --time --weight=1
+
+ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
-# RELOAD SSOWAT
+# END OF SCRIPT
 #=================================================
 
-# Regenerate SSOwat conf
-dockerapp_ynh_reloadservices
+ynh_script_progression --message="Installation of $app completed" --time --last
