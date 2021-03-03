@@ -39,7 +39,7 @@
                     "fr": "Choisissez un chemin pour gollum"
                 },
                 "example": "/mypath",
-                "default": "/gollum"
+                "default": "/"
             },{
                 "name": "is_public",
                 "type": "boolean",

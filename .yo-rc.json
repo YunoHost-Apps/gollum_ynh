@@ -1,7 +1,7 @@
 {
   "generator-dockerapp-yunohost": {
     "beautifulName": "gollum",
-    "defaultPathOption": "/gollum",
+    "defaultPathOption": "/",
     "forceSecureAccess": false,
     "secureAccessOption": true,
     "adminUserOption": false,
