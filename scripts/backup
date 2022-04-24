@@ -7,7 +7,14 @@ set -eu
 #=================================================
 
 [ ! -e _common.sh ] && cp ../settings/scripts/_common.sh ./.
-[ ! -e docker/ ] && cp -rf ../settings/scripts/docker/ ./.
+# Those alias will use the correct version installed for the app
+# For example: use `ynh_gem install` instead of `gem install`
+#
+# With `sudo` or `ynh_exec_as`, use instead the fallback variables `$ynh_gem` and `$ynh_ruby`
+# And propagate $PATH to sudo with $ynh_ruby_load_path
+# Exemple: `ynh_exec_as $app $ynh_ruby_load_path $ynh_gem install`
+# FIXME:
+# [ ! -e ruby/ ] && cp -rf ../settings/scripts/ruby/ ./.
 source _common.sh
 source /usr/share/yunohost/helpers
 
@@ -26,7 +33,6 @@ domain=$(ynh_app_setting_get "$app" domain)
 path_url=$(ynh_app_setting_get "$app" path)
 
 
-dockerapp_ynh_loadvariables
 
 #=================================================
 # BACKUP THE APP MAIN DIR

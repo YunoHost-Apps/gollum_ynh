@@ -16,14 +16,11 @@ source /usr/share/yunohost/helpers
 app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get "$app" domain)
 
-dockerapp_ynh_loadvariables
 
 #=================================================
 # STOP AND REMOVE SERVICE
 #=================================================
-
-# docker rm
-dockerapp_ynh_rm
+# FIXME:
 
 #=================================================
 # REMOVE APP MAIN DIR
@@ -43,4 +40,5 @@ ynh_remove_nginx_config
 #=================================================
 
 # Regenerate SSOwat conf
-dockerapp_ynh_reloadservices
+# TODO: check
+ynh_reloadservices

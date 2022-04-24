@@ -1,4 +1,4 @@
-# (Dockerized) Gollum for Yunohost
+# Gollum for Yunohost
 
 [![Install gollum with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=gollum)
 
@@ -6,22 +6,10 @@ A simple, Git-powered wiki with a sweet API and local frontend.
 
 *[Checkout the official Gollum repository](https://github.com/gollum/gollum/)*
 
-**Careful! This will install Docker on your instance!**
-This app is inside a [Docker image](https://hub.docker.com/r/gollumorg/gollum).
-
-## Forking an external git repo
-
-This installer only does a `git init` in `/home/yunohost.docker/$YOUR_APP_NAME_HERE/wiki` (replace `$YOUR_APP_NAME_HERE` by the name you chose when installing this app).
-To use an existing Git repository as your wiki source, you can do :
-
-```bash
-cd /home/yunohost.docker/$YOUR_APP_NAME_HERE
-rm wiki/.git
-git clone $YOUR_GIT_REMOTE_URL wiki
-```
-
-**Don't forget to replace `$YOUR_APP_NAME_HERE` by the name you chose when installing this app and `$YOUR_GIT_REMOTE_URL` with your actual URL for the Git repo you want to clone).**
-
----
-
-_It was generated with [DockerApp Yunohost](https://github.com/aymhce/dockerappmodel_ynh/)_
+<!-- FIXME: -->
+<!-- # Those alias will use the correct version installed for the app
+# For example: use `ynh_gem install` instead of `gem install`
+#
+# With `sudo` or `ynh_exec_as`, use instead the fallback variables `$ynh_gem` and `$ynh_ruby`
+# And propagate $PATH to sudo with $ynh_ruby_load_path
+# Exemple: `ynh_exec_as $app $ynh_ruby_load_path $ynh_gem install` -->

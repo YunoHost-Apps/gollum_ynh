@@ -25,20 +25,20 @@ path_url=$(ynh_app_setting_get "$app" path)
 is_public=$(ynh_app_setting_get "$app" is_public)
 
 
-dockerapp_ynh_loadvariables
+app_ynh_loadvariables
 
 #=================================================
 # MODIFY A CONFIG FILE
 #=================================================
 
-dockerapp_ynh_findreplaceallvaribles
+app_ynh_findreplaceallvaribles
 
 #=================================================
 # COPY CONF
 #=================================================
 
 # Copy files to the right place
-dockerapp_ynh_copyconf
+app_ynh_copyconf
 
 #=================================================
 # INIT GIT REPO
@@ -67,7 +67,7 @@ dockerapp_ynh_run
 #=================================================
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
-dockerapp_ynh_preparenginx
+app_ynh_preparenginx
 
 #=================================================
 # SETUP SSOWAT
@@ -88,4 +88,4 @@ fi
 #=================================================
 
 # Regenerate SSOwat conf
-dockerapp_ynh_reloadservices
+app_ynh_reloadservices
