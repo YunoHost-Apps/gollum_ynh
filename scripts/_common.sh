@@ -6,6 +6,9 @@
 
 pkg_dependencies="ruby-gollum-lib"
 
+# TODO: Which?
+ruby_version=2.6
+
 #=================================================
 # PERSONAL HELPERS
 #=================================================
