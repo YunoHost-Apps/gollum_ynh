@@ -7,6 +7,7 @@
 #=================================================
 
 source _common.sh
+source ynh_install_ruby__2
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -14,8 +15,7 @@ source /usr/share/yunohost/helpers
 #=================================================
 
 ynh_clean_setup () {
-	### Remove this function if there's nothing to clean before calling the remove script.
-	true
+	ynh_clean_check_starting
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
@@ -25,7 +25,7 @@ ynh_abort_if_errors
 #=================================================
 
 domain=$YNH_APP_ARG_DOMAIN
-path_url=$YNH_APP_ARG_PATH
+path_url="/"
 is_public=$YNH_APP_ARG_IS_PUBLIC
 
 app=$YNH_APP_INSTANCE_NAME
@@ -33,10 +33,8 @@ app=$YNH_APP_INSTANCE_NAME
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
-ynh_script_progression --message="Validating installation parameters..." --time --weight=1
+ynh_script_progression --message="Validating installation parameters..."
 
-### If the app uses NGINX as web server (written in HTML/PHP in most cases), the final path should be "/var/www/$app".
-### If the app provides an internal web server (or uses another application server such as uWSGI), the final path should be "/opt/yunohost/$app"
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
 
@@ -46,7 +44,7 @@ ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
-ynh_script_progression --message="Storing installation settings..." --time --weight=1
+ynh_script_progression --message="Storing installation settings..."
 
 ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
@@ -56,117 +54,133 @@ ynh_app_setting_set --app=$app --key=path --value=$path_url
 #=================================================
 # FIND AND OPEN A PORT
 #=================================================
-ynh_script_progression --message="Finding an available port..." --time --weight=1
+ynh_script_progression --message="Finding an available port..."
 
 # Find an available port
-port=$(ynh_find_port --port=4567)
+port=$(ynh_find_port --port=8095)
 ynh_app_setting_set --app=$app --key=port --value=$port
 
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Installing dependencies..." --time --weight=1
+ynh_script_progression --message="Installing dependencies..."
 
-ynh_install_app_dependencies $pkg_dependencies
+ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies $build_pkg_dependencies
+ynh_exec_warn_less ynh_install_ruby --ruby_version=$ruby_version
 
-# #=================================================
-# # DOWNLOAD, CHECK AND UNPACK SOURCE
-# #=================================================
-# ynh_script_progression --message="Setting up source files..." --time --weight=1
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..."
 
-# ynh_app_setting_set --app=$app --key=final_path --value=$final_path
-# # Download, check integrity, uncompress and patch the source from app.src
-# #ynh_setup_source --dest_dir="$final_path"
+# Create a system user
+ynh_system_user_create --username=$app --home_dir="$final_path"
 
-# git clone https://github.com/gollum/gollum "$final_path" --quiet
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+ynh_script_progression --message="Setting up source files..."
+
+ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$final_path"
+
+mkdir -p "$final_path/files" "$final_path/log" "$final_path/tmp" "$final_path/public/plugin_assets"
+
+chmod 750 "$final_path"
+chmod 755 "$final_path/files" "$final_path/log" "$final_path/tmp" "$final_path/public/plugin_assets"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring NGINX web server..." --time --weight=1
+ynh_script_progression --message="Configuring NGINX web server..."
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config
 
 #=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Configuring system user..." --time --weight=1
-
-# Create a system user
-ynh_system_user_create --username=$app
-
-#=================================================
 # SPECIFIC SETUP
 #=================================================
-# ...
+# ADD A CONFIGURATION
 #=================================================
+ynh_script_progression --message="Adding a configuration file..."
 
-pushd "$final_path" || ynh_die
-    bundle install
-    bundle exec bin/gollum
-popd || ynh_die
+ynh_add_config --template="../conf/database.example.yml" --destination="$final_path/config/database.yml"
+chmod 400 "$final_path/config/database.yml"
+chown $app:$app "$final_path/config/database.yml"
+
+ynh_add_config --template="../conf/configuration.yml.example" --destination="$final_path/config/configuration.yml"
+chmod 400 "$final_path/config/configuration.yml"
+chown $app:$app "$final_path/config/configuration.yml"
+
+#=================================================
+# BUILD APP
+#=================================================
+ynh_script_progression --message="Building app..."
+
+pushd $final_path
+	ynh_use_ruby
+	ynh_gem update --system --no-document
+	ynh_gem install bundler passenger --no-document
+	# TODO: check
+	ynh_exec_warn_less apt install ruby-gollum-lib
+# 	apt install ruby ruby-dev build-essential zlib1g-dev libicu-dev
+# gem install gollum
+
+	# bundle config set --local without 'development test rmagick'
+	# bundle install
+	# ynh_exec_warn_less bundle exec rake generate_secret_token RAILS_ENV=production
+	# ynh_exec_warn_less bundle exec rake db:migrate RAILS_ENV=production
+	#ynh_exec_warn_less bundle exec rake gollum:load_default_data RAILS_ENV=production
+popd
+
+ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
+
+chmod 750 "$final_path/public"
+chmod -R o-rwx "$final_path/public"
+chown -R $app:www-data "$final_path/public"
 
 #=================================================
 # SETUP SYSTEMD
 #=================================================
-ynh_script_progression --message="Configuring a systemd service..." --time --weight=1
+ynh_script_progression --message="Configuring a systemd service..."
 
 # Create a dedicated systemd config
 ynh_add_systemd_config
 
 #=================================================
-# MODIFY A CONFIG FILE
-#=================================================
-
-### `ynh_replace_string` is used to replace a string in a file.
-### (It's compatible with sed regular expressions syntax)
-
-ynh_replace_string --match_string="match_string" --replace_string="replace_string" --target_file="$final_path/CONFIG_FILE"
-
-#=================================================
-# STORE THE CONFIG FILE CHECKSUM
-#=================================================
-
-# Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum --file="$final_path/CONFIG_FILE"
-
-#=================================================
 # GENERIC FINALIZATION
 #=================================================
-# SECURE FILES AND DIRECTORIES
+# SETUP LOGROTATE
 #=================================================
+ynh_script_progression --message="Configuring log rotation..."
 
-# Set permissions to app files
-chown -R root: $final_path
+mkdir -p "/var/log/$app"
+chown -R $app:$app "/var/log/$app"
+# Use logrotate to manage application logfile(s)
+ynh_use_logrotate
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
-ynh_script_progression --message="Integrating service in YunoHost..." --time --weight=1
+ynh_script_progression --message="Integrating service in YunoHost..."
 
-yunohost service add $app --description="A short description of the app" --log="/var/log/$app/$app.log"
+yunohost service add $app --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --time --weight=1
+ynh_script_progression --message="Starting a systemd service..."
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
-
-#=================================================
-# SETUP FAIL2BAN
-#=================================================
-ynh_script_progression --message="Configuring Fail2Ban..." --time --weight=1
-
-# Create a dedicated Fail2Ban config
-ynh_add_fail2ban_config --logpath="/var/log/nginx/${domain}-error.log" --failregex="Regex to match into the log for a failed login"
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log" --line_match="WEBrick::HTTPServer#start"
 
 #=================================================
 # SETUP SSOWAT
 #=================================================
-ynh_script_progression --message="Configuring permissions..." --time --weight=1
+ynh_script_progression --message="Configuring permissions..."
 
 # Make app public if necessary
 if [ $is_public -eq 1 ]
@@ -179,7 +193,7 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reloading NGINX web server..." --time --weight=1
+ynh_script_progression --message="Reloading NGINX web server..."
 
 ynh_systemd_action --service_name=nginx --action=reload
 
@@ -187,4 +201,4 @@ ynh_systemd_action --service_name=nginx --action=reload
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of $app completed" --time --last
+ynh_script_progression --message="Installation of $app completed"
