@@ -52,9 +52,10 @@
                 "name": "git_repo_url",
                 "type": "string",
                 "ask": {
-                    "en": "What is the URL of the Git repository that you want to clone?",
-                    "fr": "Quelle est l'URL du répertoire Git à cloner ?"
+                    "en": "What is the URL of the Git repository that you want to clone? (optional)",
+                    "fr": "Quelle est l'URL du répertoire Git à cloner ? (optionnel)"
                 },
+                "optional": "True",
                 "default": ""
             }
         ]
