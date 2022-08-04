@@ -7,7 +7,7 @@
 #=================================================
 
 source _common.sh
-source ynh_install_ruby__2
+# source ynh_install_ruby__2
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -82,7 +82,7 @@ ynh_remove_nginx_config
 ynh_script_progression --message="Removing dependencies..."
 
 # Remove metapackage and its dependencies
-ynh_remove_ruby
+# ynh_remove_ruby
 ynh_remove_app_dependencies
 
 #=================================================

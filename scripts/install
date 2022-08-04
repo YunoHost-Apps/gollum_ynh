@@ -7,7 +7,7 @@
 #=================================================
 
 source _common.sh
-source ynh_install_ruby__2
+# source ynh_install_ruby__2
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -66,7 +66,7 @@ ynh_app_setting_set --app=$app --key=port --value=$port
 ynh_script_progression --message="Installing dependencies..."
 
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies $build_pkg_dependencies
-ynh_exec_warn_less ynh_install_ruby --ruby_version=$ruby_version
+# ynh_exec_warn_less ynh_install_ruby --ruby_version=$ruby_version
 
 #=================================================
 # CREATE DEDICATED USER
@@ -117,13 +117,12 @@ chown $app:$app "$final_path/config.yml"
 ynh_script_progression --message="Building app..."
 
 pushd $final_path
-	ynh_use_ruby
+	# ynh_use_ruby
 	ynh_gem update --system --no-document
 	ynh_gem install bundler passenger --no-document
-	ynh_exec_warn_less apt install build-essential zlib1g-dev libicu-dev
-	# ruby-dev
-	# ynh_exec_warn_less apt install ruby-gollum-lib libicu-dev
-	ynh_gem install gollum
+	ynh_exec_warn_less apt install ruby-gollum-lib
+	# ynh_exec_warn_less apt install build-essential zlib1g-dev libicu-dev libxslt-dev ruby-dev
+	# ynh_gem install gollum
 
 	# bundle config set --local without 'development test rmagick'
 	# bundle install

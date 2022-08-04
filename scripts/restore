@@ -8,7 +8,7 @@
 
 # Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
 source ../settings/scripts/_common.sh
-source ../settings/scripts/ynh_install_ruby__2
+# source ../settings/scripts/ynh_install_ruby__2
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -79,7 +79,7 @@ ynh_script_progression --message="Reinstalling dependencies..."
 
 # Define and install dependencies
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies $build_pkg_dependencies
-ynh_exec_warn_less ynh_install_ruby --ruby_version=$ruby_version
+# ynh_exec_warn_less ynh_install_ruby --ruby_version=$ruby_version
 
 #=================================================
 # BUILD APP
@@ -87,7 +87,7 @@ ynh_exec_warn_less ynh_install_ruby --ruby_version=$ruby_version
 ynh_script_progression --message="Building app..."
 
 pushd $final_path
-	ynh_use_ruby
+	# ynh_use_ruby
 	ynh_gem update --system --no-document
 	ynh_gem install bundler passenger --no-document
 	bundle config set --local without 'development test rmagick'
