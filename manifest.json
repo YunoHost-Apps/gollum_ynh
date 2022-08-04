@@ -48,6 +48,14 @@
                     "fr": "Est-ce qu'un·e non-membre peut accéder à l'application ?"
                 },
                 "default": true
+            },{
+                "name": "git_repo_url",
+                "type": "string",
+                "ask": {
+                    "en": "What is the URL of the Git repository that you want to clone?",
+                    "fr": "Quelle est l'URL du répertoire Git à cloner ?"
+                },
+                "default": ""
             }
         ]
     }

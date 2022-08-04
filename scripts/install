@@ -138,6 +138,11 @@ popd
 
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
+# Clone the repo if arg is not empty
+if [ -n "${YNH_APP_ARG_GIT_REPO_URL}" ]; then
+	git clone "$YNH_APP_ARG_GIT_REPO_URL" "$final_path/public"
+fi
+
 chmod 750 "$final_path/public"
 chmod -R o-rwx "$final_path/public"
 chown -R $app:www-data "$final_path/public"
