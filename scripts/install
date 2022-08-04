@@ -118,8 +118,8 @@ ynh_script_progression --message="Building app..."
 
 pushd $final_path
 	# ynh_use_ruby
-	ynh_gem update --system --no-document
-	ynh_gem install bundler passenger --no-document
+	# ynh_gem update --system --no-document
+	# ynh_gem install bundler passenger --no-document
 	ynh_exec_warn_less apt install ruby-gollum-lib
 	# ynh_exec_warn_less apt install build-essential zlib1g-dev libicu-dev libxslt-dev ruby-dev
 	# ynh_gem install gollum
