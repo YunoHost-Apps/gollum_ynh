@@ -58,7 +58,7 @@ ynh_remove_logrotate
 ynh_script_progression --message="Removing the app package..."
 
 # Remove a database if it exists, along with the associated user
-ruby-gollum-lib
+ynh_exec_warn_less apt remove ruby-gollum-lib
 
 #=================================================
 # REMOVE APP MAIN DIR
