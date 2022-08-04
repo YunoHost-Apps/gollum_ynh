@@ -45,7 +45,7 @@
                 "type": "boolean",
                 "ask": {
                     "en": "Can a non-member access the app?",
-                    "fr": "Un non-membre peut-il accéder à l'application ?"
+                    "fr": "Est-ce qu'un·e non-membre peut accéder à l'application ?"
                 },
                 "default": true
             }
