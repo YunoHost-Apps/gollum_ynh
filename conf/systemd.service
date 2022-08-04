@@ -9,7 +9,7 @@ Group=__APP__
 WorkingDirectory=__FINALPATH__/
 Environment="__YNH_RUBY_LOAD_PATH__"
 Environment=RAILS_SERVE_STATIC_FILES=true
-ExecStart=/opt/rbenv/versions/__APP__/bin/ruby gollum /var/www/__APP__/ --port __PORT__
+ExecStart=/opt/rbenv/versions/__APP__/bin/ruby gollum __FINALPATH__/public --port __PORT__
 StandardOutput=append:/var/log/__APP__/__APP__.log
 TimeoutSec=30
 RestartSec=15s
