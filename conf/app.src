@@ -1,7 +1,8 @@
-SOURCE_URL=https://github.com/redmine/redmine/archive/refs/tags/4.2.4.tar.gz
-SOURCE_SUM=c6214ef1279eecfdead9104fe032ccc07fc66dda4106c3dceb475d29795fa6ac
+SOURCE_URL=https://github.com/gollum/gollum/archive/refs/tags/v5.3.0.tar.gz
+SOURCE_SUM=e9bb95ab924dc8869e6b0676486d22479e5f70c69fc22a8bad8e6e93676edcd4
 SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=tar.gz
 SOURCE_IN_SUBDIR=true
 SOURCE_FILENAME=
+#SOURCE_FILENAME=gollum-5.3.0
 SOURCE_EXTRACT=true
