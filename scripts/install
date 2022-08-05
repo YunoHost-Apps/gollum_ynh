@@ -175,7 +175,9 @@ yunohost service add $app --log="/var/log/$app/$app.log"
 ynh_script_progression --message="Starting a systemd service..."
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log" --line_match="WEBrick::HTTPServer#start"
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+# TODO:
+# ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"  --line_match="WEBrick::HTTPServer#start"
 
 #=================================================
 # SETUP SSOWAT
