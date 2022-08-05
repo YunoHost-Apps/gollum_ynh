@@ -1,0 +1,7 @@
+SOURCE_URL=https://github.com/gollum/gollum/archive/refs/tags/v5.3.0.tar.gz
+SOURCE_SUM=e9bb95ab924dc8869e6b0676486d22479e5f70c69fc22a8bad8e6e93676edcd4
+SOURCE_SUM_PRG=sha256sum
+SOURCE_FORMAT=tar.gz
+SOURCE_IN_SUBDIR=true
+SOURCE_FILENAME=
+SOURCE_EXTRACT=true
